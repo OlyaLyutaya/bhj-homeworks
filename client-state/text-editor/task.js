@@ -1,18 +1,17 @@
-const textareaElement = document.getElementById('editor');
-const clearButtonElement = document.getElementById('clearField');
+const textArea = document.querySelector('#editor');
+const savedText = localStorage.getItem('text');
 
-// Events
-document.addEventListener('DOMContentLoaded', () => loadDataFromLocalStorage());
-textareaElement.addEventListener('input', () => saveDataInLocalStorage());
-clearButtonElement.addEventListener('click', () => clearText());
+const updateStorage = () => {
+  textArea.addEventListener('input', () => {
+    localStorage.setItem('text', textArea.value);
+  });
+};
 
-// Handlers
-function saveDataInLocalStorage() {
-  localStorage.setItem('text', textareaElement.value);
-}
-
-function loadDataFromLocalStorage() {
-  textareaElement.value = localStorage.getItem('text');
+if (savedText) {
+  textArea.value = savedText;
+  updateStorage();
+} else {
+  updateStorage();
 }
 
 function clearText() {
