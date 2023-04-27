@@ -7,7 +7,7 @@ modalClose.addEventListener('click', (e) => {
   document.cookie = 'modalClose=true';
 });
 
-if (!document.cookie.match(/true/g)) {
+if (document.cookie.indexOf('modalClose=true') === -1) {
   modal.classList.add('modal_active');
 } else {
   modal.classList.remove('modal_active');
