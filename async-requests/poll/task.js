@@ -1,4 +1,3 @@
-loaderGet('https://students.netoservices.ru/nestjs-backend/poll', requestHandler);
 const pollTitle = document.querySelector('#poll__title');
 const pollAnswers = document.querySelector('#poll__answers');
 const buttonNext = document.querySelector('.button-next_active');
@@ -35,15 +34,22 @@ function requestHandler(response) {
   }
 }
 
-pollAnswers.addEventListener('click', (e) => {
-  if (e.target.parentNode === pollAnswers) {
-    alert('Спасибо, зачли!');
-  }
-  loaderPost(
+buttonNext.addEventListener('click', (e) => {
+  loaderGet(
     'https://students.netoservices.ru/nestjs-backend/poll',
-    requestHandler,
-    `vote=${e.currentTarget.dataset.id}&answer=${e.target.dataset.index}`
+    requestHandler
   );
+});
+
+pollAnswers.addEventListener('click', (e) => {
+  if (e.target.nodeName === 'BUTTON') {
+    alert('Спасибо, зачли!');
+    loaderPost(
+      'https://students.netoservices.ru/nestjs-backend/poll',
+      requestHandler,
+      `vote=${e.currentTarget.dataset.id}&answer=${e.target.dataset.index}`
+    );
+  }
 });
 
 function loaderGet(url, callback) {
@@ -68,13 +74,4 @@ function loaderPost(url, callback, post) {
 
   xhr.open('POST', url, true);
 
-  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  xhr.send(post);
-  xhr.onload = function () {
-    if (xhr.status != 200) {
-      alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-    } else {
-      return callback(JSON.parse(xhr.response));
-    }
-  };
-}
+  xhr.setRequestHeader('Content-type', '
