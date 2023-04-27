@@ -1,77 +1,29 @@
-const pollTitle = document.querySelector('#poll__title');
-const pollAnswers = document.querySelector('#poll__answers');
-const buttonNext = document.querySelector('.button-next_active');
+const title = document.getElementById('poll__title');
+const answersList = document.getElementById('poll__answers');
 
-buttonNext.addEventListener('click', (e) => {
-  loaderGet(
-    'https://students.netoservices.ru/nestjs-backend/poll',
-    requestHandler
-  );
-});
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://students.netoservices.ru/nestjs-backend/poll');
+xhr.addEventListener('readystatechange', show);
+xhr.send();
 
-function requestHandler(response) {
-  if (pollAnswers.firstChild != null) {
-    while (pollAnswers.firstChild) {
-      pollAnswers.removeChild(pollAnswers.firstChild);
+function show(event) {
+
+    if (xhr.readyState === 4 && xhr.status === 200) {
+
+        const data = JSON.parse(xhr.responseText).data;
+        title.innerText = data.title;
+
+        for (const answer of data.answers) {
+
+            const btn = `<button class="poll__answer">${answer}</button>`;
+
+            answersList.insertAdjacentHTML('beforeend', btn);
+        }
+
+        const answerBtns = document.querySelectorAll('.poll__answer');
+        
+        for (const answerBtn of answerBtns) {
+            answerBtn.addEventListener('click', () => alert('Спасибо, ваш голос засчитан!'));
+        }
     }
-
-    if (response.data) {
-      pollTitle.textContent = response.data.title;
-      pollAnswers.dataset.id = response.id;
-      for (let i = 0; i < response.data.answers.length; i += 1) {
-        const button = document.createElement('button');
-        button.textContent = response.data.answers[i];
-        button.dataset.index = i;
-        pollAnswers.appendChild(button);
-      }
-    } else if (response.stat) {
-      for (let i = 0; i < response.stat.length; i += 1) {
-        const div = document.createElement('div');
-        div.innerText = `${response.stat[i].answer} : ${response.stat[i].votes}`;
-        pollAnswers.appendChild(div);
-      }
-    }
-  }
 }
-
-buttonNext.addEventListener('click', (e) => {
-  loaderGet(
-    'https://students.netoservices.ru/nestjs-backend/poll',
-    requestHandler
-  );
-});
-
-pollAnswers.addEventListener('click', (e) => {
-  if (e.target.nodeName === 'BUTTON') {
-    alert('Спасибо, зачли!');
-    loaderPost(
-      'https://students.netoservices.ru/nestjs-backend/poll',
-      requestHandler,
-      `vote=${e.currentTarget.dataset.id}&answer=${e.target.dataset.index}`
-    );
-  }
-});
-
-function loaderGet(url, callback) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.open('GET', url, true);
-
-  xhr.responseType = '';
-
-  xhr.send();
-  xhr.onload = function () {
-    if (xhr.status != 200) {
-      alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-    } else {
-      return callback(JSON.parse(xhr.response));
-    }
-  };
-}
-
-function loaderPost(url, callback, post) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.open('POST', url, true);
-
-  xhr.setRequestHeader('Content-type', '
